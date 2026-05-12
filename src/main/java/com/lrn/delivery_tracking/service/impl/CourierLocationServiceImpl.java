@@ -75,10 +75,18 @@ public class CourierLocationServiceImpl implements CourierLocationService {
 	public CourierLocationResponse latestLocation(Long courierId) {
 		courierRepo.findById(courierId)
 				.orElseThrow(() -> new NotFoundException("Courier not found with id: " + courierId));
+		
+		CourierLocationResponse location = cache.getLatestLocation(courierId).orElse(null);
+		
+		if(location != null) return location;
+		
 		CourierLocation latesLocation = locationRepo
 								.findTopByCourierIdOrderByRecordedAtDesc(courierId)
 								.orElseThrow(() -> new NotFoundException("Location not found for courier id: " + courierId));
-		return CourierLocationMapper.toResponse(latesLocation);
+		
+		CourierLocationResponse res = CourierLocationMapper.toResponse(latesLocation);
+		cache.saveLatestLocation(courierId, res);
+		return res; 
 	}
 
 }
