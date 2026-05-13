@@ -43,5 +43,18 @@ public class GlobalExceptionHandler {
 					.body(new ExceptionResponse(errors, HttpStatus.BAD_REQUEST.value(), "Bad Request"));
 	}
 	
+	@ExceptionHandler(InvalidCredentialsException.class)
+	public ResponseEntity<ExceptionResponse> handleInvalidCredentials(InvalidCredentialsException ex){
+		return ResponseEntity
+				.status(HttpStatus.BAD_REQUEST)
+				.body(new ExceptionResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value(), "Bad Request"));
+	}
+	
+	@ExceptionHandler(UserDisabledException.class)
+	public ResponseEntity<ExceptionResponse> handleUserDisabled(UserDisabledException ex){
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.body(new ExceptionResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value(), "Bad Request"));
+	}
+	
 	
 }

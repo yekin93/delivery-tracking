@@ -9,7 +9,8 @@ import com.lrn.delivery_tracking.dto.request.RegisterRequest;
 import com.lrn.delivery_tracking.dto.response.AuthResponse;
 import com.lrn.delivery_tracking.entity.User;
 import com.lrn.delivery_tracking.exception.AlreadyExistsException;
-import com.lrn.delivery_tracking.exception.NotFoundException;
+import com.lrn.delivery_tracking.exception.InvalidCredentialsException;
+import com.lrn.delivery_tracking.exception.UserDisabledException;
 import com.lrn.delivery_tracking.mapper.AuthMapper;
 import com.lrn.delivery_tracking.repository.UserRepository;
 import com.lrn.delivery_tracking.service.AuthService;
@@ -46,14 +47,14 @@ public class AuthServiceImpl implements AuthService {
 	@Override
 	@Transactional(readOnly = true)
 	public AuthResponse login(LoginRequest req) {
-		User user = userRepo.findByEmail(req.email()).orElseThrow(() -> new NotFoundException("User not found with email: " + req.email()));
+		User user = userRepo.findByEmail(req.email()).orElseThrow(() -> new InvalidCredentialsException("Invalid Credentials"));
 		
 		if(!user.isEnabled()) {
 			throw new RuntimeException("User is disabled");
 		}
 		
 		if(!passwordEncoder.matches(req.password(), user.getPasswordHash())) {
-			throw new RuntimeException("Invalid credentials");
+			throw new UserDisabledException("Invalid Credentials");
 		}
 		
 		return AuthMapper.toResponse(user);
