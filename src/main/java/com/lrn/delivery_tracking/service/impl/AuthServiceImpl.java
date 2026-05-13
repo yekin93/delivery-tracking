@@ -50,11 +50,11 @@ public class AuthServiceImpl implements AuthService {
 		User user = userRepo.findByEmail(req.email()).orElseThrow(() -> new InvalidCredentialsException("Invalid Credentials"));
 		
 		if(!user.isEnabled()) {
-			throw new RuntimeException("User is disabled");
+			throw new UserDisabledException("User is disabled");
 		}
 		
 		if(!passwordEncoder.matches(req.password(), user.getPasswordHash())) {
-			throw new UserDisabledException("Invalid Credentials");
+			throw new InvalidCredentialsException("Invalid Credentials");
 		}
 		
 		return AuthMapper.toResponse(user);
