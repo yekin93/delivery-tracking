@@ -10,7 +10,8 @@ public record AuthResponse(
 		String lastName,
 		String email,
 		Role role,
-		Instant createdAt
+		Instant createdAt,
+		String token
 		) {
 
 }

@@ -13,6 +13,7 @@ import com.lrn.delivery_tracking.exception.InvalidCredentialsException;
 import com.lrn.delivery_tracking.exception.UserDisabledException;
 import com.lrn.delivery_tracking.mapper.AuthMapper;
 import com.lrn.delivery_tracking.repository.UserRepository;
+import com.lrn.delivery_tracking.security.JwtService;
 import com.lrn.delivery_tracking.service.AuthService;
 
 @Service
@@ -20,11 +21,14 @@ public class AuthServiceImpl implements AuthService {
 
 	private final UserRepository userRepo;
 	private final PasswordEncoder passwordEncoder;
+	private final JwtService jwtService;
 	
 	public AuthServiceImpl(UserRepository userRepo,
-							PasswordEncoder passwordEncoder) {
+							PasswordEncoder passwordEncoder,
+							JwtService jwtService) {
 		this.userRepo = userRepo;
 		this.passwordEncoder = passwordEncoder;
+		this.jwtService = jwtService;
 	}
 	
 	
@@ -39,8 +43,8 @@ public class AuthServiceImpl implements AuthService {
 		user.setPasswordHash(passwordEncoder.encode(req.password()));
 		
 		User registered = userRepo.save(user);
-		
-		return AuthMapper.toResponse(registered);
+		String token = jwtService.generateAccessToken(registered);
+		return AuthMapper.toResponse(registered, token);
 	}
 
 
@@ -57,7 +61,9 @@ public class AuthServiceImpl implements AuthService {
 			throw new InvalidCredentialsException("Invalid Credentials");
 		}
 		
-		return AuthMapper.toResponse(user);
+		String token = jwtService.generateAccessToken(user);
+		
+		return AuthMapper.toResponse(user, token);
 	}
 
 }

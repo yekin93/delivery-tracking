@@ -8,13 +8,14 @@ public class AuthMapper {
 	
 	private AuthMapper() {}
 	
-	public static AuthResponse toResponse(User user) {
+	public static AuthResponse toResponse(User user, String token) {
 		return new AuthResponse(user.getId(),
 								user.getFirstName(),
 								user.getLastName(),
 								user.getEmail(),
 								user.getRole(),
-								user.getCreatedAt());
+								user.getCreatedAt(),
+								token);
 	}
 	
 	public static User toEntity(RegisterRequest req) {
