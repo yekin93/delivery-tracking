@@ -2,6 +2,8 @@ package com.lrn.delivery_tracking.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +20,7 @@ import com.lrn.delivery_tracking.dto.response.CourierLocationResponse;
 import com.lrn.delivery_tracking.dto.response.CourierResponse;
 import com.lrn.delivery_tracking.dto.response.GlobalResponse;
 import com.lrn.delivery_tracking.dto.response.PageResponse;
+import com.lrn.delivery_tracking.security.CustomUserDetails;
 import com.lrn.delivery_tracking.service.CourierLocationService;
 import com.lrn.delivery_tracking.service.CourierService;
 
@@ -100,6 +103,11 @@ public class CourierController {
 	public ResponseEntity<GlobalResponse<CourierLocationResponse>> getLatestLocation(@PathVariable Long courierId){
 		CourierLocationResponse latestLocation = locationService.latestLocation(courierId);
 		return ResponseEntity.ok(new GlobalResponse<>(latestLocation, HttpStatus.OK.value(), "Latest location successfully fetched"));
+	}
+	
+	@GetMapping("/me")
+	public ResponseEntity<GlobalResponse<String>> me(@AuthenticationPrincipal CustomUserDetails user){
+		return ResponseEntity.ok(new GlobalResponse<>(user.getUsername(), HttpStatus.OK.value(), "loggedin user fetched successfully"));
 	}
 	
 }
