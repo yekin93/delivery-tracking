@@ -12,13 +12,14 @@ public class CustomUserDetails implements UserDetails {
 	
 	private static final long serialVersionUID = 1L;
 	
-	
+	private final Long id;
 	private final String email;
 	private final String password;
 	private final String role;
 	private final  boolean enabled;
 	
 	public CustomUserDetails(Long id, String email, String password, String role, boolean enabled) {
+		this.id = id;
 		this.email = email;
 		this.password = password;
 		this.role = role;
@@ -39,6 +40,10 @@ public class CustomUserDetails implements UserDetails {
 	@Override
 	public String getUsername() {
 		return email;
+	}
+	
+	public Long getId() {
+		return id;
 	}
 
 	
