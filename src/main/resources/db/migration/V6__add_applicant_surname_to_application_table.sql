@@ -1,0 +1,1 @@
+ALTER TABLE applications ADD COLUMN applicant_surname VARCHAR(100);

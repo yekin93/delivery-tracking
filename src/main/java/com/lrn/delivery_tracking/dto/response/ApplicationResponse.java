@@ -6,6 +6,7 @@ public record ApplicationResponse(
 		
 		Long id,
 		String applicantName,
+		String applicantSurname,
 		String businessName,
 		String type,
 		String status,

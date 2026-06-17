@@ -1,12 +1,22 @@
 package com.lrn.delivery_tracking.service.impl;
 
+
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.lrn.delivery_tracking.dto.request.ApplicationCreateRequest;
 import com.lrn.delivery_tracking.dto.response.ApplicationResponse;
+import com.lrn.delivery_tracking.dto.response.PageResponse;
 import com.lrn.delivery_tracking.entity.Application;
 import com.lrn.delivery_tracking.entity.User;
+import com.lrn.delivery_tracking.enums.ApplicationStatus;
+import com.lrn.delivery_tracking.enums.ApplicationType;
 import com.lrn.delivery_tracking.exception.AlreadyExistsException;
 import com.lrn.delivery_tracking.exception.NotFoundException;
 import com.lrn.delivery_tracking.mapper.ApplicationMapper;
@@ -42,6 +52,37 @@ public class ApplicationServiceImpl implements ApplicationService {
 		application.setUser(user);
 		Application createdApplication = appRepo.save(application);
 		return ApplicationMapper.toResponse(createdApplication);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public PageResponse<ApplicationResponse> getApplications(ApplicationStatus status, ApplicationType type, int size, int page, String sortBy) {
+		Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, "createdAt"));
+		Page<Application> applicationsPage = appRepo.findByTypeAndStatus(type, status, pageable);
+		
+		List<ApplicationResponse> appList = applicationsPage
+								.getContent()
+								.stream()
+								.map(ApplicationMapper::toResponse)
+								.toList();
+		return new PageResponse<ApplicationResponse>(appList, applicationsPage.getNumber(), applicationsPage.getSize(), applicationsPage.getTotalElements(), applicationsPage.getTotalPages());
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public ApplicationResponse getById(Long id) {
+		Application application = appRepo.findById(id).orElseThrow(() -> new NotFoundException("Application not found with id " + id));
+		return ApplicationMapper.toResponse(application);
+	}
+
+	@Override
+	@Transactional
+	public void approveApplication(Long approverId, Long applicationId) {
+		User approver = userRepo.findById(approverId).orElseThrow(() -> new NotFoundException("Not found approver with id: " + approverId));
+		Application application = appRepo.findById(applicationId).orElseThrow(() -> new NotFoundException("Application not found with id: " + applicationId));
+		
+		
+		
 	}
 
 }

@@ -48,6 +48,9 @@ public class Application {
 	@Column(name = "applicant_name", length = 100)
 	private String applicantName;
 	
+	@Column(name = "applicant_surname", length = 100)
+	private String applicantSurname;
+	
 	@Column(name = "business_name", length = 100)
 	private String businessName;
 	

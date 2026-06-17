@@ -16,6 +16,9 @@ public record ApplicationCreateRequest(
 		@Size(max = 100, message = "Applicant name must not exceed 100 character")
 		String applicantName,
 		
+		@Size(max = 100, message = "Applicant name must be exceed 100 character")
+		String applicantSurname,
+		
 		@Size(max = 100, message = "Business name must not exceed 100 character")
 		String businessName,
 		

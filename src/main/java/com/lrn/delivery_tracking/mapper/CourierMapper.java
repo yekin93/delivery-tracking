@@ -2,6 +2,7 @@ package com.lrn.delivery_tracking.mapper;
 
 import com.lrn.delivery_tracking.dto.request.CourierCreateRequest;
 import com.lrn.delivery_tracking.dto.response.CourierResponse;
+import com.lrn.delivery_tracking.entity.Application;
 import com.lrn.delivery_tracking.entity.Courier;
 
 public class CourierMapper {
@@ -29,5 +30,10 @@ public class CourierMapper {
 		courier.setPhone(req.phone());
 		return courier;
 	}
+	
+//	public static Courier applicationToCourier(Application app) {
+//		Courier courier = new Courier();
+//		courier.setName(null);
+//	}
 	
 }

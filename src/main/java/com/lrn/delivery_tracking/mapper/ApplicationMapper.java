@@ -10,6 +10,7 @@ public class ApplicationMapper {
 	public static ApplicationResponse toResponse(Application application) {
 		return new ApplicationResponse(application.getId(),
 				application.getApplicantName(),
+				application.getApplicantSurname(),
 				application.getBusinessName(),
 				application.getType().name(),
 				application.getStatus().name(),
@@ -23,6 +24,7 @@ public class ApplicationMapper {
 	public static Application toEntity(ApplicationCreateRequest req) {
 		Application app = new Application();
 		app.setApplicantName(req.applicantName());
+		app.setApplicantSurname(req.applicantSurname());
 		app.setBusinessName(req.businessName());
 		app.setType(req.type());
 		app.setEmail(req.email());
