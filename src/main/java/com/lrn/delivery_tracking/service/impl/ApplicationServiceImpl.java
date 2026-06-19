@@ -107,4 +107,23 @@ public class ApplicationServiceImpl implements ApplicationService {
 		return ApplicationMapper.toResponse(approved);
 	}
 
+	@Override
+	@Transactional
+	public ApplicationResponse rejectApplication(Long rejecterId, Long applicationId) {
+		Application application = appRepo.findById(applicationId).orElseThrow(() -> new NotFoundException("Not found application with id: " + applicationId));
+		
+		if(application.getStatus().equals(ApplicationStatus.REJECTED)) {
+			throw new BadRequestException("Application has already been rejected");
+		} else if(application.getStatus().equals(ApplicationStatus.APPROVED)) {
+			throw new BadRequestException("Application has already been approved");
+		}
+		
+		User controller = userRepo.findById(rejecterId).orElseThrow(() -> new NotFoundException("User not found with id: " + rejecterId));
+		application.setStatus(ApplicationStatus.REJECTED);
+		application.setReviewed(controller);
+		application.setReviewedAt(Instant.now());
+		Application rejected = appRepo.save(application);
+		return ApplicationMapper.toResponse(rejected);
+	}
+
 }

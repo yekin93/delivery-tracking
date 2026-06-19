@@ -54,5 +54,11 @@ public class AdminController {
 		ApplicationResponse application = applicationService.approveApplication(user.getId(), id);
 		return ResponseEntity.ok(new GlobalResponse<>(application, HttpStatus.OK.value(), "Application successfully approved"));
 	}
+	
+	@PostMapping("/applications/{id}/reject")
+	public ResponseEntity<GlobalResponse<ApplicationResponse>> rejectApplication(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long id) {
+		ApplicationResponse rejected = applicationService.rejectApplication(user.getId(), id);
+		return ResponseEntity.ok(new GlobalResponse<>(rejected, HttpStatus.OK.value(), "Application successfully rejected"));
+	}
 
 }

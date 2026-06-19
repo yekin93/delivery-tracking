@@ -13,5 +13,5 @@ public interface ApplicationService {
 	PageResponse<ApplicationResponse> getApplications(ApplicationStatus status, ApplicationType type, int size, int page, String sortBy);
 	ApplicationResponse getById(Long id);
 	ApplicationResponse approveApplication(Long approverId, Long applicationId);
-	
+	ApplicationResponse rejectApplication(Long rejecterId, Long applicationId);
 }
