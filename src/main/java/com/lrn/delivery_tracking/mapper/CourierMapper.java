@@ -31,9 +31,13 @@ public class CourierMapper {
 		return courier;
 	}
 	
-//	public static Courier applicationToCourier(Application app) {
-//		Courier courier = new Courier();
-//		courier.setName(null);
-//	}
+	public static Courier applicationToCourier(Application app) {
+		Courier courier = new Courier();
+		courier.setName(app.getApplicantName());
+		courier.setSurname(app.getApplicantSurname());
+		courier.setEmail(app.getEmail());
+		courier.setPhone(app.getPhone());
+		return courier;
+	}
 	
 }

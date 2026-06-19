@@ -1,6 +1,7 @@
 package com.lrn.delivery_tracking.service.impl;
 
 
+import java.time.Instant;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -14,12 +15,15 @@ import com.lrn.delivery_tracking.dto.request.ApplicationCreateRequest;
 import com.lrn.delivery_tracking.dto.response.ApplicationResponse;
 import com.lrn.delivery_tracking.dto.response.PageResponse;
 import com.lrn.delivery_tracking.entity.Application;
+import com.lrn.delivery_tracking.entity.Courier;
 import com.lrn.delivery_tracking.entity.User;
 import com.lrn.delivery_tracking.enums.ApplicationStatus;
 import com.lrn.delivery_tracking.enums.ApplicationType;
 import com.lrn.delivery_tracking.exception.AlreadyExistsException;
+import com.lrn.delivery_tracking.exception.BadRequestException;
 import com.lrn.delivery_tracking.exception.NotFoundException;
 import com.lrn.delivery_tracking.mapper.ApplicationMapper;
+import com.lrn.delivery_tracking.mapper.CourierMapper;
 import com.lrn.delivery_tracking.repository.ApplicationRepository;
 import com.lrn.delivery_tracking.repository.CourierRepository;
 import com.lrn.delivery_tracking.repository.UserRepository;
@@ -58,7 +62,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 	@Transactional(readOnly = true)
 	public PageResponse<ApplicationResponse> getApplications(ApplicationStatus status, ApplicationType type, int size, int page, String sortBy) {
 		Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, "createdAt"));
-		Page<Application> applicationsPage = appRepo.findByTypeAndStatus(type, status, pageable);
+		Page<Application> applicationsPage = appRepo.findByFilters(type, status, pageable);
 		
 		List<ApplicationResponse> appList = applicationsPage
 								.getContent()
@@ -77,12 +81,30 @@ public class ApplicationServiceImpl implements ApplicationService {
 
 	@Override
 	@Transactional
-	public void approveApplication(Long approverId, Long applicationId) {
+	public ApplicationResponse approveApplication(Long approverId, Long applicationId) {
 		User approver = userRepo.findById(approverId).orElseThrow(() -> new NotFoundException("Not found approver with id: " + approverId));
 		Application application = appRepo.findById(applicationId).orElseThrow(() -> new NotFoundException("Application not found with id: " + applicationId));
 		
+		if(application.getStatus().equals(ApplicationStatus.APPROVED)) {
+			throw new BadRequestException("Application has already been approved.");
+		}
+		
+		if(application.getStatus().equals(ApplicationStatus.REJECTED)) {
+			throw new BadRequestException("Application has already been rejected.");
+		}
+		
+		Courier courier = CourierMapper.applicationToCourier(application);
+		courier.setUser(application.getUser());
+		courierRepo.save(courier);
+		
+		application.setStatus(ApplicationStatus.APPROVED);
+		application.setReviewed(approver);
+		application.setReviewedAt(Instant.now());
 		
 		
+		Application approved = appRepo.save(application);
+
+		return ApplicationMapper.toResponse(approved);
 	}
 
 }
