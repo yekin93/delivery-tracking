@@ -1,16 +1,19 @@
 package com.lrn.delivery_tracking.entity;
 
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
-import com.lrn.delivery_tracking.enums.Role;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -41,10 +44,6 @@ public class User {
 	@Column(name = "password_hash", length = 255)
 	private String passwordHash;
 	
-	@Enumerated(EnumType.STRING)
-	@Column(length = 50, nullable = false)
-	private Role role;
-	
 	@Column(nullable = false)
 	private boolean enabled;
 	
@@ -54,14 +53,19 @@ public class User {
 	@Column(name = "created_at", nullable = false)
 	private Instant createdAt;
 	
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(
+			name = "user_roles",
+			joinColumns = @JoinColumn(name = "user_id"),
+			inverseJoinColumns = @JoinColumn(name = "role_id")
+			)
+	private Set<Role> roles = new HashSet<>();
+	
 	@PrePersist
 	private void onCreate() {
 		Instant now = Instant.now();
 		this.createdAt = now;
 		this.updatedAt = now;
-		if(this.role == null) {
-			this.role = Role.CUSTOMER;
-		}
 		this.enabled = true;
 	}
 	

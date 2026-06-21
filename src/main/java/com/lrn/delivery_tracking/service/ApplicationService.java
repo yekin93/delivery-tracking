@@ -2,7 +2,6 @@ package com.lrn.delivery_tracking.service;
 
 import com.lrn.delivery_tracking.dto.request.ApplicationCreateRequest;
 import com.lrn.delivery_tracking.dto.response.ApplicationResponse;
-import com.lrn.delivery_tracking.dto.response.CourierResponse;
 import com.lrn.delivery_tracking.dto.response.PageResponse;
 import com.lrn.delivery_tracking.enums.ApplicationStatus;
 import com.lrn.delivery_tracking.enums.ApplicationType;

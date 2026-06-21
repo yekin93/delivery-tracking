@@ -16,9 +16,11 @@ import com.lrn.delivery_tracking.dto.response.ApplicationResponse;
 import com.lrn.delivery_tracking.dto.response.PageResponse;
 import com.lrn.delivery_tracking.entity.Application;
 import com.lrn.delivery_tracking.entity.Courier;
+import com.lrn.delivery_tracking.entity.Role;
 import com.lrn.delivery_tracking.entity.User;
 import com.lrn.delivery_tracking.enums.ApplicationStatus;
 import com.lrn.delivery_tracking.enums.ApplicationType;
+import com.lrn.delivery_tracking.enums.RoleType;
 import com.lrn.delivery_tracking.exception.AlreadyExistsException;
 import com.lrn.delivery_tracking.exception.BadRequestException;
 import com.lrn.delivery_tracking.exception.NotFoundException;
@@ -26,6 +28,7 @@ import com.lrn.delivery_tracking.mapper.ApplicationMapper;
 import com.lrn.delivery_tracking.mapper.CourierMapper;
 import com.lrn.delivery_tracking.repository.ApplicationRepository;
 import com.lrn.delivery_tracking.repository.CourierRepository;
+import com.lrn.delivery_tracking.repository.RoleRepository;
 import com.lrn.delivery_tracking.repository.UserRepository;
 import com.lrn.delivery_tracking.service.ApplicationService;
 
@@ -35,14 +38,17 @@ public class ApplicationServiceImpl implements ApplicationService {
 	private final ApplicationRepository appRepo;
 	private final UserRepository userRepo;
 	private final CourierRepository courierRepo;
+	private final RoleRepository roleRepo;
 	
 	public ApplicationServiceImpl(ApplicationRepository appRepo,
 								UserRepository userRepo,
-								CourierRepository courierRepo) {
+								CourierRepository courierRepo,
+								RoleRepository roleRepo) {
 		this.appRepo = appRepo;
 		this.userRepo = userRepo;
 		this.courierRepo = courierRepo;
-	}
+		this.roleRepo = roleRepo;
+		}
 
 	@Override
 	@Transactional
@@ -103,6 +109,12 @@ public class ApplicationServiceImpl implements ApplicationService {
 		
 		
 		Application approved = appRepo.save(application);
+		User courierUser = application.getUser();
+		
+		Role role = roleRepo.findByName(RoleType.COURIER.name()).orElse(null);
+		
+		if(role != null) courierUser.getRoles().add(role);
+		userRepo.save(courierUser);
 
 		return ApplicationMapper.toResponse(approved);
 	}

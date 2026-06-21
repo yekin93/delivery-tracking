@@ -7,14 +7,18 @@ import org.springframework.transaction.annotation.Transactional;
 import com.lrn.delivery_tracking.dto.request.LoginRequest;
 import com.lrn.delivery_tracking.dto.request.RegisterRequest;
 import com.lrn.delivery_tracking.dto.response.AuthResponse;
+import com.lrn.delivery_tracking.entity.Role;
 import com.lrn.delivery_tracking.entity.User;
+import com.lrn.delivery_tracking.enums.RoleType;
 import com.lrn.delivery_tracking.exception.AlreadyExistsException;
 import com.lrn.delivery_tracking.exception.InvalidCredentialsException;
 import com.lrn.delivery_tracking.exception.UserDisabledException;
 import com.lrn.delivery_tracking.mapper.AuthMapper;
+import com.lrn.delivery_tracking.repository.RoleRepository;
 import com.lrn.delivery_tracking.repository.UserRepository;
 import com.lrn.delivery_tracking.security.JwtService;
 import com.lrn.delivery_tracking.service.AuthService;
+
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -22,13 +26,16 @@ public class AuthServiceImpl implements AuthService {
 	private final UserRepository userRepo;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtService jwtService;
+	private final RoleRepository roleRepo;
 	
 	public AuthServiceImpl(UserRepository userRepo,
 							PasswordEncoder passwordEncoder,
-							JwtService jwtService) {
+							JwtService jwtService,
+							RoleRepository roleRepo) {
 		this.userRepo = userRepo;
 		this.passwordEncoder = passwordEncoder;
 		this.jwtService = jwtService;
+		this.roleRepo = roleRepo;
 	}
 	
 	
@@ -41,7 +48,8 @@ public class AuthServiceImpl implements AuthService {
 		
 		User user = AuthMapper.toEntity(req);
 		user.setPasswordHash(passwordEncoder.encode(req.password()));
-		
+		Role role = roleRepo.findByName(RoleType.CUSTOMER.name()).orElse(null);
+		if(role != null) user.getRoles().add(role);
 		User registered = userRepo.save(user);
 		String token = jwtService.generateAccessToken(registered);
 		return AuthMapper.toResponse(registered, token);
