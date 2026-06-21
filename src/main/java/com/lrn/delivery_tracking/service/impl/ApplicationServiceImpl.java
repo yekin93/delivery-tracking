@@ -19,6 +19,7 @@ import com.lrn.delivery_tracking.entity.Courier;
 import com.lrn.delivery_tracking.entity.User;
 import com.lrn.delivery_tracking.enums.ApplicationStatus;
 import com.lrn.delivery_tracking.enums.ApplicationType;
+import com.lrn.delivery_tracking.enums.Role;
 import com.lrn.delivery_tracking.exception.AlreadyExistsException;
 import com.lrn.delivery_tracking.exception.BadRequestException;
 import com.lrn.delivery_tracking.exception.NotFoundException;
@@ -103,6 +104,9 @@ public class ApplicationServiceImpl implements ApplicationService {
 		
 		
 		Application approved = appRepo.save(application);
+		User courierUser = application.getUser();
+		courierUser.setRole(Role.COURIER);
+		userRepo.save(courierUser);
 
 		return ApplicationMapper.toResponse(approved);
 	}
