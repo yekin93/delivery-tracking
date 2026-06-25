@@ -21,6 +21,7 @@ import com.lrn.delivery_tracking.entity.User;
 import com.lrn.delivery_tracking.enums.ApplicationStatus;
 import com.lrn.delivery_tracking.enums.ApplicationType;
 import com.lrn.delivery_tracking.enums.RoleType;
+import com.lrn.delivery_tracking.enums.Role;
 import com.lrn.delivery_tracking.exception.AlreadyExistsException;
 import com.lrn.delivery_tracking.exception.BadRequestException;
 import com.lrn.delivery_tracking.exception.NotFoundException;
