@@ -1,8 +1,9 @@
 package com.lrn.delivery_tracking.enums;
 
-public enum Role {
+public enum RoleType {
 
 	ADMIN,
 	CUSTOMER,
-	COURIER
+	COURIER,
+	RESTAURANT
 }
