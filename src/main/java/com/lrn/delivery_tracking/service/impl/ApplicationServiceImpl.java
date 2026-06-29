@@ -21,7 +21,6 @@ import com.lrn.delivery_tracking.entity.User;
 import com.lrn.delivery_tracking.enums.ApplicationStatus;
 import com.lrn.delivery_tracking.enums.ApplicationType;
 import com.lrn.delivery_tracking.enums.RoleType;
-import com.lrn.delivery_tracking.enums.Role;
 import com.lrn.delivery_tracking.exception.AlreadyExistsException;
 import com.lrn.delivery_tracking.exception.BadRequestException;
 import com.lrn.delivery_tracking.exception.NotFoundException;
@@ -54,8 +53,8 @@ public class ApplicationServiceImpl implements ApplicationService {
 	@Override
 	@Transactional
 	public ApplicationResponse create(Long userId, ApplicationCreateRequest req) {
-		if(courierRepo.existsByUserId(userId)) {
-			throw new AlreadyExistsException("Already exists courier for user id : " + userId);
+		if(appRepo.existsByIdAndType(userId, req.type())){
+			throw new AlreadyExistsException("Already exists application for user id : " + userId);
 		}
 		
 		User user = userRepo.findById(userId).orElseThrow(() -> new NotFoundException("User not found with id:" + userId));

@@ -59,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
 	@Override
 	@Transactional(readOnly = true)
 	public AuthResponse login(LoginRequest req) {
-		User user = userRepo.findByEmail(req.email()).orElseThrow(() -> new InvalidCredentialsException("Invalid Credentials"));
+		User user = userRepo.findByEmailWithRoles(req.email()).orElseThrow(() -> new InvalidCredentialsException("Invalid Credentials"));
 		
 		if(!user.isEnabled()) {
 			throw new UserDisabledException("User is disabled");

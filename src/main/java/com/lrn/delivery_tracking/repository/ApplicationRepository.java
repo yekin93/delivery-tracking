@@ -23,4 +23,6 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 				AND (:status IS NULL or status = :status)
 			""")
 	Page<Application> findByFilters(ApplicationType type, ApplicationStatus status, Pageable pageable);
+	
+	boolean existsByIdAndType(Long id, ApplicationType type);
 }
