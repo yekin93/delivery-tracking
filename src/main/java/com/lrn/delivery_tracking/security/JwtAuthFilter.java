@@ -2,6 +2,7 @@ package com.lrn.delivery_tracking.security;
 
 import java.io.IOException;
 
+import org.jboss.logging.MDC;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -44,6 +45,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 				UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 				authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				SecurityContextHolder.getContext().setAuthentication(authToken);
+				MDC.put("user", email);
 			}
 		}
 		filterChain.doFilter(request, response);

@@ -16,6 +16,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.lrn.delivery_tracking.logging.RequestLoggingFilter;
 import com.lrn.delivery_tracking.security.CustomUserDetailsService;
 import com.lrn.delivery_tracking.security.JwtAuthFilter;
 
@@ -27,11 +28,13 @@ public class SecurityConfig {
 	private final JwtAuthFilter jwtAuthFilter;
 	private final CustomUserDetailsService userDetailsService;
 	private final PasswordEncoder passwordEncoder;
+	private final RequestLoggingFilter requestLoggingFilter;
 	
-	public SecurityConfig(JwtAuthFilter jwtAuthFilter, CustomUserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+	public SecurityConfig(JwtAuthFilter jwtAuthFilter, CustomUserDetailsService userDetailsService, PasswordEncoder passwordEncoder, RequestLoggingFilter requestLoggingFilter) {
 		this.jwtAuthFilter = jwtAuthFilter;
 		this.userDetailsService = userDetailsService;
 		this.passwordEncoder = passwordEncoder;
+		this.requestLoggingFilter = requestLoggingFilter;
 	}
 	
 	@Bean
@@ -51,6 +54,7 @@ public class SecurityConfig {
 				.anyRequest().authenticated())
 				.authenticationProvider(authenticationProvider())
 				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+				.addFilterAfter(requestLoggingFilter, JwtAuthFilter.class)
 				.exceptionHandling(ex -> 
 				ex.authenticationEntryPoint((req, res, authException) -> {
 					res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
