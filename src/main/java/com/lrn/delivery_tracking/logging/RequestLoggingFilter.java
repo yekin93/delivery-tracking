@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
+import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -53,12 +54,14 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
 		
 		Instant start = Instant.now();
 		ContentCachingRequestWrapper cachingRequest = new ContentCachingRequestWrapper(request, 1024 * 1024);
+		ContentCachingResponseWrapper cachingResponse = new ContentCachingResponseWrapper(response);
+		
 		String requestId = UUID.randomUUID().toString();
 		MDC.put("requestId", requestId);
 		MDC.put("ip", getClientIp(request));
 		//MDC.put("user", getCurrentUser());
 		try {
-			filterChain.doFilter(cachingRequest, response);
+			filterChain.doFilter(cachingRequest, cachingResponse);
 		} finally {
 			long durationMs = Duration.between(start, Instant.now()).toMillis();
 					
@@ -73,6 +76,7 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
 	                User      : {}
 	                IP        : {}
 	                Payload   : {}
+	                Response  : {}
 	                =====================================================
 	                """,
 	                requestId,
@@ -83,9 +87,11 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
 					durationMs,
 					getCurrentUser(),
 					getClientIp(request),
-					maskSensitiveFields(getRequestBody(cachingRequest))
+					maskSensitiveFields(getRequestBody(cachingRequest)),
+					maskSensitiveFields(getResponseBody(cachingResponse))
 					);
 			MDC.clear();
+			cachingResponse.copyBodyToResponse();
 		}
 	}
 	
@@ -139,6 +145,16 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
 	
 	private String getRequestBody(ContentCachingRequestWrapper request) {
 	    byte[] content = request.getContentAsByteArray();
+
+	    if (content.length == 0) {
+	        return "";
+	    }
+
+	    return new String(content, StandardCharsets.UTF_8);
+	}
+	
+	private String getResponseBody(ContentCachingResponseWrapper response) {
+	    byte[] content = response.getContentAsByteArray();
 
 	    if (content.length == 0) {
 	        return "";
